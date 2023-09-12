@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BomberMap.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">BomberMap.java</span></div><h1>BomberMap.java</h1><pre class="source lang-java linenums">package demolition;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+
+/**
+ * Exception which is thrown when the map layout is invalid.
+ */
+class InvalidConfigurationException extends Exception {
+    /**
+     * Creates a new InvalidConfigurationException with the given error message
+     * based on the condition it was raised by.
+     * 
+     * @param message Error message
+     */
+    public InvalidConfigurationException(String message) {
+<span class="fc" id="L25">        super(message);</span>
+<span class="fc" id="L26">    }</span>
+}
+
+/**
+ * Represents the map layout of the game.
+ */
+public class BomberMap {
+
+    /**
+     * Vertical offset value when drawing characters.
+     */
+<span class="fc" id="L37">    private final int OFFSET = 64;</span>
+
+    /**
+     * Represents the size of one grid in pixels.
+     */
+<span class="fc" id="L42">    private final int GRID_SIZE = 32;</span>
+
+    /**
+     * Represents the width of the app window.
+     */
+<span class="fc" id="L47">    private final int WIDTH_GRIDS = 15;</span>
+
+    /**
+     * Represents the height of the app window.
+     */
+<span class="fc" id="L52">    private final int HEIGHT_GRIDS = 13;</span>
+
+    private static Tile emptyTile;
+    private static Tile brokenTile;
+    private static Tile wallTile;
+    private static Tile goalTile;
+
+    /**
+     * Two-dimensional Tile array which stores the Tile on each coordinate on the
+     * map.
+     */
+    private Tile[][] mapCoord;
+
+    /**
+     * Initial location of the Player.
+     */
+    private Tuple playerInitialLocation;
+
+    /**
+     * Location of the Goal tile.
+     */
+    private Tuple goalLocation;
+
+    /**
+     * List of initial locations of the RedEnemy objects.
+     */
+    private List&lt;Tuple&gt; redLocation;
+
+    /**
+     * List of intial locations of the YellowEnemy objects.
+     */
+    private List&lt;Tuple&gt; yellowLocation;
+
+    /**
+     * Creates a new BomberMap object.
+     */
+<span class="fc" id="L88">    public BomberMap() {</span>
+<span class="fc" id="L89">        this.mapCoord = new Tile[HEIGHT_GRIDS][WIDTH_GRIDS];</span>
+<span class="fc" id="L90">        this.playerInitialLocation = null;</span>
+<span class="fc" id="L91">        this.redLocation = new ArrayList&lt;Tuple&gt;();</span>
+<span class="fc" id="L92">        this.yellowLocation = new ArrayList&lt;Tuple&gt;();</span>
+<span class="fc" id="L93">        this.goalLocation = null;</span>
+<span class="fc" id="L94">    }</span>
+
+    /**
+     * Loads the required four Tile objects (Empty, Broken, Wall, Goal) and their
+     * respective sprites. Require Papplet object.
+     * 
+     * @param app App of the game.
+     */
+    public static void setup(PApplet app) {
+        // load images
+<span class="fc" id="L104">        PImage empty = app.loadImage(&quot;src/main/resources/empty/empty.png&quot;);</span>
+<span class="fc" id="L105">        PImage broken = app.loadImage(&quot;src/main/resources/broken/broken.png&quot;);</span>
+<span class="fc" id="L106">        PImage wall = app.loadImage(&quot;src/main/resources/wall/solid.png&quot;);</span>
+<span class="fc" id="L107">        PImage goal = app.loadImage(&quot;src/main/resources/goal/goal.png&quot;);</span>
+
+        // create necessary instances
+<span class="fc" id="L110">        emptyTile = new Tile(&quot;empty&quot;, empty);</span>
+<span class="fc" id="L111">        brokenTile = new Tile(&quot;broken&quot;, broken);</span>
+<span class="fc" id="L112">        wallTile = new Tile(&quot;wall&quot;, wall);</span>
+<span class="fc" id="L113">        goalTile = new Tile(&quot;goal&quot;, goal);</span>
+<span class="fc" id="L114">    }</span>
+
+    /**
+     * Reads the given configuration .txt file which contains the Tile types and
+     * characters on each coordinate. The .txt file will be checked if the map
+     * layout is valid before pairing the Tile obejcts to their respective
+     * locations.
+     * 
+     * @param filename
+     * @throws InvalidConfigurationException
+     */
+    public void read(String filename) throws InvalidConfigurationException {
+
+<span class="fc" id="L127">        BufferedReader checker = null;</span>
+<span class="fc" id="L128">        BufferedReader reader = null;</span>
+<span class="fc" id="L129">        int upperBorderIndex = -1;</span>
+<span class="fc" id="L130">        int lowerBorderIndex = -1;</span>
+<span class="fc" id="L131">        List&lt;String&gt; mapChars = new ArrayList&lt;String&gt;(</span>
+<span class="fc" id="L132">                Arrays.asList(new String[] { &quot;W&quot;, &quot;B&quot;, &quot;G&quot;, &quot; &quot;, &quot;P&quot;, &quot;R&quot;, &quot;Y&quot; }));</span>
+
+        try {
+            String strCurrentLine;
+<span class="fc" id="L136">            int rows = 0;</span>
+<span class="fc" id="L137">            boolean upperBorder = false;</span>
+<span class="fc" id="L138">            boolean lowerBorder = false;</span>
+
+<span class="fc" id="L140">            checker = new BufferedReader(new FileReader(filename));</span>
+
+<span class="fc bfc" id="L142" title="All 2 branches covered.">            while ((strCurrentLine = checker.readLine()) != null) {</span>
+
+<span class="fc bfc" id="L144" title="All 2 branches covered.">                if (strCurrentLine.length() != 15) {</span>
+<span class="fc" id="L145">                    throw new InvalidConfigurationException(&quot;Invalid Configuration File: width should be 15!&quot;);</span>
+                }
+                ;
+
+<span class="fc bfc" id="L149" title="All 2 branches covered.">                if (strCurrentLine.equals(&quot;WWWWWWWWWWWWWWW&quot;)) {</span>
+<span class="fc bfc" id="L150" title="All 2 branches covered.">                    if (upperBorder) {</span>
+<span class="fc" id="L151">                        lowerBorder = true;</span>
+<span class="fc" id="L152">                        lowerBorderIndex = rows;</span>
+                    } else {
+<span class="fc" id="L154">                        upperBorder = true;</span>
+<span class="fc" id="L155">                        upperBorderIndex = rows;</span>
+                    }
+                }
+
+<span class="fc" id="L159">                rows++;</span>
+            }
+
+<span class="pc bpc" id="L162" title="1 of 4 branches missed.">            if (!(upperBorder &amp;&amp; lowerBorder)) {</span>
+<span class="fc" id="L163">                throw new InvalidConfigurationException(&quot;Invalid Configuration File: invalid upper or lower borders&quot;);</span>
+            }
+
+<span class="pc bpc" id="L166" title="1 of 2 branches missed.">            if (rows != HEIGHT_GRIDS) {</span>
+<span class="nc" id="L167">                throw new InvalidConfigurationException(&quot;Invalid Configuration File: height should be 13!&quot;);</span>
+            }
+
+<span class="fc" id="L170">        } catch (FileNotFoundException ex) {</span>
+<span class="fc" id="L171">            System.err.println(&quot;File not found&quot;);</span>
+
+<span class="nc" id="L173">        } catch (IOException ex) {</span>
+<span class="nc" id="L174">            ex.printStackTrace();</span>
+
+        } finally {
+            try {
+<span class="fc bfc" id="L178" title="All 2 branches covered.">                if (checker != null)</span>
+<span class="fc" id="L179">                    checker.close();</span>
+<span class="nc" id="L180">            } catch (IOException ex) {</span>
+<span class="nc" id="L181">                ex.printStackTrace();</span>
+<span class="fc" id="L182">            }</span>
+        }
+
+        try {
+<span class="fc" id="L186">            reader = new BufferedReader(new FileReader(filename));</span>
+
+<span class="fc bfc" id="L188" title="All 2 branches covered.">            for (int i = 0; i &lt; HEIGHT_GRIDS; i++) {</span>
+<span class="fc" id="L189">                String[] blockTypes = reader.readLine().split(&quot;&quot;);</span>
+
+<span class="fc bfc" id="L191" title="All 4 branches covered.">                if (i &gt; upperBorderIndex &amp;&amp; i &lt; lowerBorderIndex) {</span>
+<span class="pc bpc" id="L192" title="1 of 4 branches missed.">                    if (!(blockTypes[0].equals(&quot;W&quot;) &amp;&amp; blockTypes[WIDTH_GRIDS - 1].equals(&quot;W&quot;))) {</span>
+<span class="fc" id="L193">                        throw new InvalidConfigurationException(</span>
+                                &quot;Invalid Configuration File: invalid side borders on &quot; + filename + &quot;: row &quot; + (i + 1));
+                    }
+                }
+
+<span class="fc bfc" id="L198" title="All 2 branches covered.">                for (int j = 0; j &lt; WIDTH_GRIDS; j++) {</span>
+<span class="fc bfc" id="L199" title="All 2 branches covered.">                    if (!(mapChars.contains(blockTypes[j]))) {</span>
+<span class="fc" id="L200">                        throw new InvalidConfigurationException(&quot;Invalid Configuration File: invalid map character &quot;</span>
+                                + blockTypes[j] + &quot; on &quot; + filename + &quot;: row &quot; + (i + 1));
+
+                    }
+
+<span class="fc bfc" id="L205" title="All 2 branches covered.">                    if (blockTypes[j].equals(&quot;W&quot;)) {</span>
+<span class="fc" id="L206">                        mapCoord[i][j] = wallTile;</span>
+
+<span class="fc bfc" id="L208" title="All 2 branches covered.">                    } else if (blockTypes[j].equals(&quot;B&quot;)) {</span>
+<span class="fc" id="L209">                        mapCoord[i][j] = brokenTile;</span>
+
+<span class="fc bfc" id="L211" title="All 2 branches covered.">                    } else if (blockTypes[j].equals(&quot;G&quot;)) {</span>
+
+<span class="fc bfc" id="L213" title="All 2 branches covered.">                        if (this.goalLocation != null) {</span>
+<span class="fc" id="L214">                            throw new InvalidConfigurationException(</span>
+                                    &quot;Invalid Configuration File: multiple goals specified!&quot;);
+                        } else {
+<span class="fc" id="L217">                            mapCoord[i][j] = goalTile;</span>
+<span class="fc" id="L218">                            this.goalLocation = new Tuple(j, i);</span>
+                        }
+
+<span class="fc bfc" id="L221" title="All 2 branches covered.">                    } else if (blockTypes[j].equals(&quot;P&quot;)) {</span>
+
+<span class="fc bfc" id="L223" title="All 2 branches covered.">                        if (this.playerInitialLocation != null) {</span>
+<span class="fc" id="L224">                            throw new InvalidConfigurationException(</span>
+                                    &quot;Invalid Configuration File: multiple players specified!&quot;);
+                        } else {
+<span class="fc" id="L227">                            mapCoord[i][j] = emptyTile;</span>
+<span class="fc" id="L228">                            this.playerInitialLocation = new Tuple(j, i);</span>
+                        }
+
+<span class="fc bfc" id="L231" title="All 2 branches covered.">                    } else if (blockTypes[j].equals(&quot;R&quot;)) {</span>
+<span class="fc" id="L232">                        mapCoord[i][j] = emptyTile;</span>
+<span class="fc" id="L233">                        this.redLocation.add(new Tuple(j, i));</span>
+
+<span class="fc bfc" id="L235" title="All 2 branches covered.">                    } else if (blockTypes[j].equals(&quot;Y&quot;)) {</span>
+<span class="fc" id="L236">                        mapCoord[i][j] = emptyTile;</span>
+<span class="fc" id="L237">                        this.yellowLocation.add(new Tuple(j, i));</span>
+
+                    } else {
+<span class="fc" id="L240">                        mapCoord[i][j] = emptyTile;</span>
+                    }
+
+                }
+            }
+
+<span class="fc bfc" id="L246" title="All 2 branches covered.">            if (this.playerInitialLocation == null) {</span>
+<span class="fc" id="L247">                throw new InvalidConfigurationException(&quot;Invalid Configuration File: No player location specified!&quot;);</span>
+            }
+
+<span class="fc bfc" id="L250" title="All 2 branches covered.">            if (this.goalLocation == null) {</span>
+<span class="fc" id="L251">                throw new InvalidConfigurationException(&quot;Invalid Configuration File: No goal location specified!&quot;);</span>
+            }
+
+<span class="fc" id="L254">        } catch (FileNotFoundException ex) {</span>
+<span class="fc" id="L255">            System.err.println(&quot;File not found&quot;);</span>
+
+<span class="nc" id="L257">        } catch (IOException ex) {</span>
+<span class="nc" id="L258">            ex.printStackTrace();</span>
+
+        } finally {
+            try {
+<span class="fc bfc" id="L262" title="All 2 branches covered.">                if (reader != null)</span>
+<span class="fc" id="L263">                    reader.close();</span>
+<span class="nc" id="L264">            } catch (IOException ex) {</span>
+<span class="nc" id="L265">                ex.printStackTrace();</span>
+<span class="fc" id="L266">            }</span>
+        }
+<span class="fc" id="L268">    }</span>
+
+    /**
+     * Demolish the &quot;Broken&quot; Tile on the given location.
+     * 
+     * @param location Location of the &quot;Broken&quot; Tile
+     */
+    public void demolish(Tuple location) {
+<span class="nc" id="L276">        int x = location.x;</span>
+<span class="nc" id="L277">        int y = location.y;</span>
+<span class="nc" id="L278">        mapCoord[y][x] = emptyTile;</span>
+<span class="nc" id="L279">    }</span>
+
+    /**
+     * Returns the Tile type on the specified location of the map. Requires the
+     * coordinates of the desired location.
+     * 
+     * @param x x coordinate of the location
+     * @param y y coordinate of the location
+     * @return Tile type
+     */
+    public String getTileType(int x, int y) {
+<span class="fc" id="L290">        Tile tile = mapCoord[y][x];</span>
+<span class="fc" id="L291">        return tile.getType();</span>
+    }
+
+    /**
+     * Returns the initial location of the Player.
+     * 
+     * @return Initial location of the Player.
+     */
+    public Tuple getPlayerInitialLocation() {
+<span class="fc" id="L300">        return this.playerInitialLocation;</span>
+    }
+
+    /**
+     * Returns the list of initial location of the RedEnemy objects.
+     * 
+     * @return List of initial location of the RedEnemy objects.
+     */
+    public List&lt;Tuple&gt; getRedLocation() {
+<span class="fc" id="L309">        return this.redLocation;</span>
+    }
+
+    /**
+     * Returns the list of initial location of the YellowEnemy objects.
+     * 
+     * @return List of initial location of the YellowEnemy objects.
+     */
+    public List&lt;Tuple&gt; getYellowLocation() {
+<span class="fc" id="L318">        return this.yellowLocation;</span>
+    }
+
+    /**
+     * Returns the location of the Goal Tile.
+     * 
+     * @return Location of the Goal Tile.
+     */
+    public Tuple getGoalLocation() {
+<span class="fc" id="L327">        return this.goalLocation;</span>
+    }
+
+    /**
+     * Draws the respective Tile sprite on the app window. Requires Papplet object.
+     * 
+     * @param app
+     */
+    public void draw(PApplet app) {
+<span class="fc bfc" id="L336" title="All 2 branches covered.">        for (int i = 0; i &lt; HEIGHT_GRIDS; i++) {</span>
+<span class="fc bfc" id="L337" title="All 2 branches covered.">            for (int j = 0; j &lt; WIDTH_GRIDS; j++) {</span>
+<span class="fc" id="L338">                app.image(this.mapCoord[i][j].getSprite(), (j * GRID_SIZE), (OFFSET + (i * GRID_SIZE)));</span>
+            }
+        }
+<span class="fc" id="L341">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

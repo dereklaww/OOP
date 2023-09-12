@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameMechanics.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">GameMechanics.java</span></div><h1>GameMechanics.java</h1><pre class="source lang-java linenums">package demolition;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import processing.core.PApplet;
+import processing.core.PFont;
+import processing.data.JSONArray;
+import processing.data.JSONObject;
+
+/**
+ * Handles the mechanics of the game.
+ */
+public class GameMechanics {
+
+    private PFont font;
+
+    /**
+     * HashMap which stores level and map in (level, map configuration) &quot;key/value&quot;
+     * pairs.
+     */
+    private HashMap&lt;Integer, BomberMap&gt; mapConfigs;
+
+    /**
+     * HashMap which stores level and UI in (level, UI) &quot;key/value&quot; pairs.
+     */
+    private HashMap&lt;Integer, UI&gt; uiConfigs;
+
+    /**
+     * Represents the current level, initally 1.
+     */
+    private int currentLevel;
+
+    /**
+     * Represents the total levels of the game, specified in the configuration .json
+     * file.
+     */
+    private int totalLevel;
+
+    /**
+     * Represents the number of levels the Player has passedm initially 0.
+     */
+    private int passCount;
+
+    /**
+     * Signals the app to update the map configurations and characters when the
+     * Player has passed a level.
+     */
+    public boolean refresh;
+
+    /**
+     * Represents the Player fails to complete the game, initially false.
+     */
+    private boolean gameOver;
+
+    /**
+     * Represents the Player won the game, initially false.
+     */
+    private boolean win;
+
+    /**
+     * Number of lives the Player initally has, specified in the configuration .json
+     * file.
+     */
+    private int lives;
+
+    /**
+     * Player object created with the specified location.
+     */
+    private Player player;
+
+    /**
+     * List of RedEnemy objects created with the specified location.
+     */
+    private List&lt;RedEnemy&gt; reds;
+
+    /**
+     * List of YellowEnemy objects created with the specified location.
+     */
+    private List&lt;YellowEnemy&gt; yellows;
+
+    /**
+     * Creates a new GameMechanics object.
+
+     */
+<span class="fc" id="L87">    public GameMechanics() {</span>
+<span class="fc" id="L88">        this.mapConfigs = new HashMap&lt;Integer, BomberMap&gt;();</span>
+<span class="fc" id="L89">        this.uiConfigs = new HashMap&lt;Integer, UI&gt;();</span>
+<span class="fc" id="L90">        this.currentLevel = 1;</span>
+<span class="fc" id="L91">        this.totalLevel = 0;</span>
+<span class="fc" id="L92">        this.passCount = 0;</span>
+<span class="fc" id="L93">        this.refresh = false;</span>
+<span class="fc" id="L94">        this.gameOver = false;</span>
+<span class="fc" id="L95">        this.win = false;</span>
+<span class="fc" id="L96">        this.lives = 0;</span>
+<span class="fc" id="L97">        this.player = null;</span>
+<span class="fc" id="L98">        this.reds = new ArrayList&lt;RedEnemy&gt;();</span>
+<span class="fc" id="L99">        this.yellows = new ArrayList&lt;YellowEnemy&gt;();</span>
+
+<span class="fc" id="L101">    }</span>
+
+    /**
+     * Load the game configurations (map layout and initial time of each level, max
+     * lives of the Player) from the given configuration .json file. Requires
+     * Papplet app.
+     * 
+     * @param app      App of the game
+     * @param pathname Directory path of cnfiguration .json file.
+     */
+    public void config(PApplet app, String pathname) {
+<span class="fc" id="L112">        font = app.createFont(&quot;src/main/resources/PressStart2P-Regular.ttf&quot;, 20);</span>
+<span class="fc" id="L113">        app.textFont(font);</span>
+
+<span class="fc" id="L115">        JSONObject config = app.loadJSONObject(pathname);</span>
+
+<span class="fc" id="L117">        JSONArray levels = config.getJSONArray(&quot;levels&quot;);</span>
+
+<span class="fc" id="L119">        this.totalLevel = levels.size();</span>
+
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        for (int i = 0; i &lt; levels.size(); i++) {</span>
+<span class="fc" id="L122">            JSONObject level = levels.getJSONObject(i);</span>
+
+<span class="fc" id="L124">            BomberMap map = new BomberMap();</span>
+
+            try {
+<span class="fc" id="L127">                map.read(level.getString(&quot;path&quot;));</span>
+<span class="nc" id="L128">            } catch (InvalidConfigurationException ex) {</span>
+<span class="nc" id="L129">                System.out.println(ex.getMessage());</span>
+<span class="nc" id="L130">                System.exit(1);</span>
+<span class="fc" id="L131">            }</span>
+
+<span class="fc" id="L133">            mapConfigs.put(i + 1, map);</span>
+
+<span class="fc" id="L135">            UI ui = new UI(level.getInt(&quot;time&quot;));</span>
+<span class="fc" id="L136">            uiConfigs.put(i + 1, ui);</span>
+
+        }
+
+<span class="fc" id="L140">        int lives = config.getInt(&quot;lives&quot;);</span>
+<span class="fc" id="L141">        this.lives = lives;</span>
+
+<span class="fc" id="L143">    }</span>
+
+    /**
+     * Creates the in-game character objects ({@link Player}, {@link RedEnemy},
+     * {@link YellowEnemy}) based on the map layout loaded in and add them into a
+     * list associated with the GameMechanics object.
+     */
+    public void setChar() {
+<span class="fc" id="L151">        this.player = new Player(getCurrentMap().getPlayerInitialLocation(), lives);</span>
+
+<span class="fc" id="L153">        List&lt;Tuple&gt; redLocation = getCurrentMap().getRedLocation();</span>
+
+<span class="fc bfc" id="L155" title="All 2 branches covered.">        for (Tuple location : redLocation) {</span>
+<span class="fc" id="L156">            RedEnemy red = new RedEnemy(location);</span>
+<span class="fc" id="L157">            this.reds.add(red);</span>
+<span class="fc" id="L158">        }</span>
+
+<span class="fc" id="L160">        List&lt;Tuple&gt; yellowLocation = getCurrentMap().getYellowLocation();</span>
+
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        for (Tuple location : yellowLocation) {</span>
+<span class="fc" id="L163">            YellowEnemy yellow = new YellowEnemy(location);</span>
+<span class="fc" id="L164">            this.yellows.add(yellow);</span>
+<span class="fc" id="L165">        }</span>
+<span class="fc" id="L166">    }</span>
+
+    /**
+     * Signals the app to refresh and update to new game configurations, initially
+     * false.
+     * 
+     * @return if the game configurations need to be refreshed and updated.
+     */
+    public boolean isRefreshed() {
+<span class="fc" id="L175">        return this.refresh;</span>
+    }
+
+    /**
+     * Returns current level. (For JUnit testing purposes only.)
+     * 
+     * @return current level
+     */
+    public int getCurrentLevel() {
+<span class="fc" id="L184">        return this.currentLevel;</span>
+    }
+
+    /**
+     * Returns BomberMap object of the current level.
+     * 
+     * @return BomberMap object
+     */
+    public BomberMap getCurrentMap() {
+<span class="fc" id="L193">        return mapConfigs.get(currentLevel);</span>
+    }
+
+    /**
+     * Returns the UI object of the current level.
+     * 
+     * @return UI object
+     */
+    public UI getCurrentUI() {
+<span class="fc" id="L202">        return uiConfigs.get(currentLevel);</span>
+    }
+
+    /**
+     * Returns the Player object created.
+     * 
+     * @return Player object
+     */
+    public Player getPlayer() {
+<span class="fc" id="L211">        return this.player;</span>
+    }
+
+    /**
+     * Returns the list of RedEnemy objects created.
+     * 
+     * @return list of RedEnemy objects
+     */
+    public List&lt;RedEnemy&gt; getReds() {
+<span class="fc" id="L220">        return this.reds;</span>
+    }
+
+    /**
+     * Returns the list of YellowEnemy objects created.
+     * 
+     * @return list of YellowEnemy objects
+     */
+    public List&lt;YellowEnemy&gt; getYellows() {
+<span class="fc" id="L229">        return this.yellows;</span>
+    }
+
+    /**
+     * Signals game over
+     */
+    public void gameOver() {
+<span class="fc" id="L236">        this.gameOver = true;</span>
+<span class="fc" id="L237">    }</span>
+
+    /**
+     * Called when the Player passes a level. If all levels were passed, signals the
+     * Player won.
+     */
+    public void pass() {
+<span class="fc" id="L244">        this.currentLevel++;</span>
+<span class="fc" id="L245">        this.passCount++;</span>
+<span class="fc bfc" id="L246" title="All 2 branches covered.">        if (passCount == totalLevel) {</span>
+<span class="fc" id="L247">            this.win = true;</span>
+        }
+<span class="fc" id="L249">    }</span>
+
+    /**
+     * Returns if the game has ended (win/lose)
+     * 
+     * @return if the game has ended.
+     */
+    public boolean isFinish() {
+<span class="fc bfc" id="L257" title="All 4 branches covered.">        return (gameOver || win);</span>
+    }
+
+    /**
+     * Draws the game end on-screen text. Requires Papplet app.
+     * 
+     * @param app App of the game.
+     */
+    public void draw(PApplet app) {
+<span class="fc bfc" id="L266" title="All 2 branches covered.">        if (gameOver) {</span>
+<span class="fc" id="L267">            app.text(&quot;GAME OVER&quot;, 145, 240);</span>
+<span class="pc bpc" id="L268" title="1 of 2 branches missed.">        } else if (win) {</span>
+<span class="fc" id="L269">            app.text(&quot;YOU WIN&quot;, 160, 240);</span>
+        }
+<span class="fc" id="L271">    }</span>
+
+    /**
+     * Logic of main game mechanics, which includes checking if the Player and
+     * enemies (RedEnemy and Yellowenemy objects) have crossed path, checking timer
+     * and Player life count (if timer reaches zero or the Player loses all its
+     * life, game ends), checking if the Player has passed a level (reaches Goal
+     * location) and signals refresh and update of game configurations.
+     */
+    public void tick() {
+        // check locations
+<span class="fc" id="L282">        List&lt;Tuple&gt; redCurrLocations = new ArrayList&lt;Tuple&gt;();</span>
+
+<span class="fc bfc" id="L284" title="All 2 branches covered.">        for (RedEnemy red : reds) {</span>
+<span class="pc bpc" id="L285" title="1 of 2 branches missed.">            if (red.isAlive())</span>
+<span class="fc" id="L286">                redCurrLocations.add(red.currLocation);</span>
+<span class="fc" id="L287">        }</span>
+
+<span class="fc" id="L289">        List&lt;Tuple&gt; yellowCurrLocations = new ArrayList&lt;Tuple&gt;();</span>
+
+<span class="fc bfc" id="L291" title="All 2 branches covered.">        for (YellowEnemy yellow : yellows) {</span>
+<span class="pc bpc" id="L292" title="1 of 2 branches missed.">            if (yellow.isAlive())</span>
+<span class="fc" id="L293">                yellowCurrLocations.add(yellow.currLocation);</span>
+<span class="fc" id="L294">        }</span>
+
+<span class="pc bpc" id="L296" title="1 of 2 branches missed.">        if (Tuple.contains(redCurrLocations, player.currLocation)</span>
+<span class="fc bfc" id="L297" title="All 2 branches covered.">                || Tuple.contains(yellowCurrLocations, player.currLocation)) {</span>
+<span class="fc" id="L298">            player.die();</span>
+        }
+
+        // check timer
+<span class="fc bfc" id="L302" title="All 2 branches covered.">        if (getCurrentUI().getTimer() == 0) {</span>
+<span class="fc" id="L303">            gameOver();</span>
+        }
+
+        // check player lives
+<span class="fc bfc" id="L307" title="All 2 branches covered.">        if (player.getLifeCount() == 0) {</span>
+<span class="fc" id="L308">            gameOver();</span>
+        }
+
+<span class="fc bfc" id="L311" title="All 2 branches covered.">        if (player.currLocation.tupleEquals(getCurrentMap().getGoalLocation())) {</span>
+<span class="fc" id="L312">            refresh = true;</span>
+<span class="fc" id="L313">            pass();</span>
+<span class="fc bfc" id="L314" title="All 2 branches covered.">            if (!isFinish()) {</span>
+<span class="fc" id="L315">                this.lives = player.getLifeCount();</span>
+<span class="fc" id="L316">                this.reds = new ArrayList&lt;RedEnemy&gt;();</span>
+<span class="fc" id="L317">                this.yellows = new ArrayList&lt;YellowEnemy&gt;();</span>
+<span class="fc" id="L318">                this.player = null;</span>
+<span class="fc" id="L319">                setChar();</span>
+            }
+        }
+
+<span class="fc" id="L323">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

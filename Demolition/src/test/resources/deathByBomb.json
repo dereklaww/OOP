@@ -1,0 +1,9 @@
+{
+  "levels": [
+    {
+      "path": "src/test/resources/deathByBomb.txt",
+      "time": 180
+    }
+  ],
+  "lives": 1
+}

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Player.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">Player.java</span></div><h1>Player.java</h1><pre class="source lang-java linenums">package demolition;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+
+/**
+ * Represents the character controlled by the player, BombMan
+ */
+public class Player extends BomberChar {
+
+    private static PImage playerDown_1;
+    private static PImage playerDown_2;
+    private static PImage playerDown_3;
+    private static PImage playerDown_4;
+    private static PImage playerUp_1;
+    private static PImage playerUp_2;
+    private static PImage playerUp_3;
+    private static PImage playerUp_4;
+    private static PImage playerLeft_1;
+    private static PImage playerLeft_2;
+    private static PImage playerLeft_3;
+    private static PImage playerLeft_4;
+    private static PImage playerRight_1;
+    private static PImage playerRight_2;
+    private static PImage playerRight_3;
+    private static PImage playerRight_4;
+
+    private static PImage[] playerDown;
+    private static PImage[] playerUp;
+    private static PImage[] playerLeft;
+    private static PImage[] playerRight;
+
+    /**
+     * Represents the initlal location of the Player.
+     */
+    private Tuple initialLocation;
+
+    /**
+     * Represents the number of lives of the Player. Initial count specified in the
+     * configuration JSON file.
+     */
+    private int lifeCount;
+
+    /**
+     * Represents the number of frames the current sprite is drawn, intially 0.
+     */
+    private int frameCount;
+
+    /**
+     * List of Bomb objects created by the Player.
+     */
+    private List&lt;Bomb&gt; currBombs;
+
+    /**
+     * Creates a new Player object. Require the initial location and number of lives
+     * of the Player.
+     */
+    public Player(Tuple location, int lives) {
+<span class="fc" id="L62">        super(location);</span>
+<span class="fc" id="L63">        this.initialLocation = new Tuple(location.x, location.y);</span>
+<span class="fc" id="L64">        this.lifeCount = lives;</span>
+<span class="fc" id="L65">        this.frameCount = 0;</span>
+<span class="fc" id="L66">        this.currBombs = new ArrayList&lt;Bomb&gt;();</span>
+<span class="fc" id="L67">    }</span>
+
+    /**
+     * Loads in all the sprites required to generate the Player object's animation
+     * on the app. Requires Papplet object.
+     * 
+     * @param app App of the game.
+     */
+
+    public static void setup(PApplet app) {
+<span class="fc" id="L77">        playerDown_1 = app.loadImage(&quot;src/main/resources/player/player1.png&quot;);</span>
+<span class="fc" id="L78">        playerDown_2 = app.loadImage(&quot;src/main/resources/player/player2.png&quot;);</span>
+<span class="fc" id="L79">        playerDown_3 = app.loadImage(&quot;src/main/resources/player/player3.png&quot;);</span>
+<span class="fc" id="L80">        playerDown_4 = app.loadImage(&quot;src/main/resources/player/player4.png&quot;);</span>
+
+<span class="fc" id="L82">        playerDown = new PImage[] { playerDown_1, playerDown_2, playerDown_3, playerDown_4 };</span>
+
+<span class="fc" id="L84">        playerUp_1 = app.loadImage(&quot;src/main/resources/player/player_up1.png&quot;);</span>
+<span class="fc" id="L85">        playerUp_2 = app.loadImage(&quot;src/main/resources/player/player_up2.png&quot;);</span>
+<span class="fc" id="L86">        playerUp_3 = app.loadImage(&quot;src/main/resources/player/player_up3.png&quot;);</span>
+<span class="fc" id="L87">        playerUp_4 = app.loadImage(&quot;src/main/resources/player/player_up4.png&quot;);</span>
+
+<span class="fc" id="L89">        playerUp = new PImage[] { playerUp_1, playerUp_2, playerUp_3, playerUp_4 };</span>
+
+<span class="fc" id="L91">        playerLeft_1 = app.loadImage(&quot;src/main/resources/player/player_left1.png&quot;);</span>
+<span class="fc" id="L92">        playerLeft_2 = app.loadImage(&quot;src/main/resources/player/player_left2.png&quot;);</span>
+<span class="fc" id="L93">        playerLeft_3 = app.loadImage(&quot;src/main/resources/player/player_left3.png&quot;);</span>
+<span class="fc" id="L94">        playerLeft_4 = app.loadImage(&quot;src/main/resources/player/player_left4.png&quot;);</span>
+
+<span class="fc" id="L96">        playerLeft = new PImage[] { playerLeft_1, playerLeft_2, playerLeft_3, playerLeft_4 };</span>
+
+<span class="fc" id="L98">        playerRight_1 = app.loadImage(&quot;src/main/resources/player/player_right1.png&quot;);</span>
+<span class="fc" id="L99">        playerRight_2 = app.loadImage(&quot;src/main/resources/player/player_right2.png&quot;);</span>
+<span class="fc" id="L100">        playerRight_3 = app.loadImage(&quot;src/main/resources/player/player_right3.png&quot;);</span>
+<span class="fc" id="L101">        playerRight_4 = app.loadImage(&quot;src/main/resources/player/player_right4.png&quot;);</span>
+
+<span class="fc" id="L103">        playerRight = new PImage[] { playerRight_1, playerRight_2, playerRight_3, playerRight_4 };</span>
+
+<span class="fc" id="L105">    }</span>
+
+    /**
+     * Creates a Bomb object on the current location of the player and adds it to
+     * the list of Bombs created by the Player.
+     */
+    public void bomb() {
+<span class="fc" id="L112">        int xCoord = this.currLocation.x;</span>
+<span class="fc" id="L113">        int yCoord = this.currLocation.y;</span>
+<span class="fc" id="L114">        Bomb bomb = new Bomb(new Tuple(xCoord, yCoord));</span>
+<span class="fc" id="L115">        this.currBombs.add(bomb);</span>
+<span class="fc" id="L116">    }</span>
+
+    /**
+     * Returns the list of Bomb objects created by the Player.
+     * 
+     * @return The list of Bomb objects.
+     */
+    public List&lt;Bomb&gt; getBombs() {
+<span class="fc" id="L124">        return this.currBombs;</span>
+    }
+
+    /**
+     * Returns the current life count of the Player.
+     * 
+     * @return Current life count.
+     */
+    public int getLifeCount() {
+<span class="fc" id="L133">        return this.lifeCount;</span>
+    }
+
+    /**
+     * Player dies. Life count decrements and Player returns to inital location.
+     */
+    public void die() {
+<span class="fc" id="L140">        this.currLocation.update(initialLocation.x, initialLocation.y);</span>
+<span class="fc" id="L141">        this.lifeCount--;</span>
+<span class="fc" id="L142">    }</span>
+
+    /**
+     * Draws the Player sprite on the app window. Frame count resets when it reaches
+     * the total frames of a cycle. Requires PApplet obejct.
+     * 
+     * @param app App of the game.
+     */
+    public void draw(PApplet app) {
+<span class="fc" id="L151">        int currentSprite = Math.floorDiv(frameCount, FRAMES_PER_SPRITE);</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">        if (this.direction.equals(&quot;Down&quot;)) {</span>
+<span class="fc" id="L153">            app.image(playerDown[currentSprite], pixelX(currLocation.x), pixelY(currLocation.y));</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">        } else if (this.direction.equals(&quot;Up&quot;)) {</span>
+<span class="fc" id="L155">            app.image(playerUp[currentSprite], pixelX(currLocation.x), pixelY(currLocation.y));</span>
+<span class="pc bpc" id="L156" title="1 of 2 branches missed.">        } else if (this.direction.equals(&quot;Left&quot;)) {</span>
+<span class="nc" id="L157">            app.image(playerLeft[currentSprite], pixelX(currLocation.x), pixelY(currLocation.y));</span>
+<span class="pc bpc" id="L158" title="1 of 2 branches missed.">        } else if (this.direction.equals(&quot;Right&quot;)) {</span>
+<span class="fc" id="L159">            app.image(playerRight[currentSprite], pixelX(currLocation.x), pixelY(currLocation.y));</span>
+        }
+<span class="fc" id="L161">        frameCount++;</span>
+<span class="fc bfc" id="L162" title="All 2 branches covered.">        if (this.frameCount == TOTAL_FRAMES) {</span>
+<span class="fc" id="L163">            this.frameCount = 0;</span>
+        }
+<span class="fc" id="L165">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,394 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Bomb.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">Bomb.java</span></div><h1>Bomb.java</h1><pre class="source lang-java linenums">package demolition;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import processing.core.PApplet;
+import processing.core.PImage;
+
+/**
+ * Represents a bomb utilized by the {@link Player}
+ */
+public class Bomb extends GameObjects {
+
+    /**
+     * Vertical offset value when drawing characters.
+     */
+<span class="fc" id="L18">    private final int OFFSET = 64;</span>
+
+    /**
+     * Represents the size of one grid in pixels.
+     */
+<span class="fc" id="L23">    private final int GRID_SIZE = 32;</span>
+
+    /**
+     * Represents the time each sprite shoud be rendered before moving to onto the
+     * next sprite of the cycle.
+     */
+<span class="fc" id="L29">    protected final double TIME_PER_SPRITE_BOMB = 0.25;</span>
+
+    /**
+     * Represents the number of sprites to be rendered in one cycle.
+     */
+<span class="fc" id="L34">    protected final int NUM_OF_SPRITE_BOMB = 8;</span>
+
+    /**
+     * Represents the number of frames each sprite will be rendered.
+     */
+<span class="fc" id="L39">    protected final int FRAMES_PER_SPRITE_BOMB = framesPerSprite(TIME_PER_SPRITE_BOMB);</span>
+
+    /**
+     * Represents the total number of frames the bomb will be rendered in one cycle.
+     */
+<span class="fc" id="L44">    protected final int TOTAL_FRAMES_BOMB = NUM_OF_SPRITE_BOMB * FRAMES_PER_SPRITE_BOMB;</span>
+
+    /**
+     * Represents the total number of frames the explosion will be rendered in one
+     * cycle.
+     */
+<span class="fc" id="L50">    protected final int TOTAL_FRAMES_EXPLOSION = (int) (0.5 * FPS);</span>
+
+    private static PImage bomb1;
+    private static PImage bomb2;
+    private static PImage bomb3;
+    private static PImage bomb4;
+    private static PImage bomb5;
+    private static PImage bomb6;
+    private static PImage bomb7;
+    private static PImage bomb8;
+    private static PImage[] bombSprites;
+
+    private static PImage explosionCentre;
+    private static PImage explosionHorizontal;
+    private static PImage explosionVertical;
+    private static PImage explosionBottom;
+    private static PImage explosionTop;
+    private static PImage explosionLeft;
+    private static PImage explosionRight;
+
+    /**
+     * Location which the bomb is placed.
+     */
+    private Tuple location;
+
+    /**
+     * Number of frames the bomb is currently drawn, intially 0.
+     */
+    private int bombFrameCount;
+
+    /**
+     * Number of frames the explostion is currently drawn, intially 0.
+     */
+    private int explosionFrameCount;
+
+    /**
+     * If the bomb has exploded, initally false.
+     */
+    private boolean explode;
+
+    /**
+     * HashMap which stores explosion sprites in (location/sprite) &quot;key/value&quot;
+     * pairs.
+     */
+    private HashMap&lt;Tuple, PImage&gt; explosionCommands;
+
+    /**
+     * List of all locations affected by the explosion.
+     */
+    private List&lt;Tuple&gt; explosionArea;
+
+    /**
+     * List of all demolished &quot;Broken&quot; {@link Tile}.
+     */
+    private List&lt;Tuple&gt; demolished;
+
+    /**
+     * Creates a new bomb object, requires location which the bomb is placed.
+     * 
+     * @param location Location which the bomb is placed.
+     */
+<span class="fc" id="L111">    public Bomb(Tuple location) {</span>
+<span class="fc" id="L112">        this.location = location;</span>
+<span class="fc" id="L113">        this.bombFrameCount = 0;</span>
+<span class="fc" id="L114">        this.explosionFrameCount = 0;</span>
+<span class="fc" id="L115">        this.explode = false;</span>
+<span class="fc" id="L116">        this.explosionCommands = new HashMap&lt;Tuple, PImage&gt;();</span>
+<span class="fc" id="L117">        this.explosionArea = new ArrayList&lt;Tuple&gt;();</span>
+<span class="fc" id="L118">        this.demolished = new ArrayList&lt;Tuple&gt;();</span>
+<span class="fc" id="L119">    }</span>
+
+    /**
+     * Loads in all the sprites required to generate the bomb and explotion
+     * animation on the app. Requires the app of the game.
+     * 
+     * @param app App of the game.
+     */
+    public static void setup(PApplet app) {
+        // load bomb image
+<span class="fc" id="L129">        bomb1 = app.loadImage(&quot;src/main/resources/bomb/bomb1.png&quot;);</span>
+<span class="fc" id="L130">        bomb2 = app.loadImage(&quot;src/main/resources/bomb/bomb2.png&quot;);</span>
+<span class="fc" id="L131">        bomb3 = app.loadImage(&quot;src/main/resources/bomb/bomb3.png&quot;);</span>
+<span class="fc" id="L132">        bomb4 = app.loadImage(&quot;src/main/resources/bomb/bomb4.png&quot;);</span>
+<span class="fc" id="L133">        bomb5 = app.loadImage(&quot;src/main/resources/bomb/bomb5.png&quot;);</span>
+<span class="fc" id="L134">        bomb6 = app.loadImage(&quot;src/main/resources/bomb/bomb6.png&quot;);</span>
+<span class="fc" id="L135">        bomb7 = app.loadImage(&quot;src/main/resources/bomb/bomb7.png&quot;);</span>
+<span class="fc" id="L136">        bomb8 = app.loadImage(&quot;src/main/resources/bomb/bomb8.png&quot;);</span>
+
+<span class="fc" id="L138">        bombSprites = new PImage[] { bomb1, bomb2, bomb3, bomb4, bomb5, bomb6, bomb7, bomb8 };</span>
+
+        // load explosion image
+<span class="fc" id="L141">        explosionCentre = app.loadImage(&quot;src/main/resources/explosion/centre.png&quot;);</span>
+<span class="fc" id="L142">        explosionHorizontal = app.loadImage(&quot;src/main/resources/explosion/horizontal.png&quot;);</span>
+<span class="fc" id="L143">        explosionVertical = app.loadImage(&quot;src/main/resources/explosion/vertical.png&quot;);</span>
+<span class="fc" id="L144">        explosionBottom = app.loadImage(&quot;src/main/resources/explosion/end_bottom.png&quot;);</span>
+<span class="fc" id="L145">        explosionTop = app.loadImage(&quot;src/main/resources/explosion/end_top.png&quot;);</span>
+<span class="fc" id="L146">        explosionLeft = app.loadImage(&quot;src/main/resources/explosion/end_left.png&quot;);</span>
+<span class="fc" id="L147">        explosionRight = app.loadImage(&quot;src/main/resources/explosion/end_right.png&quot;);</span>
+
+<span class="fc" id="L149">    }</span>
+
+    /**
+     * Returns the horizontal component of the bomb's location in pixels.
+     * 
+     * @param xCoord The x coordinate of the bomb.
+     * @return value in pixels
+     */
+    public int pixelX(int xCoord) {
+<span class="fc" id="L158">        return xCoord * GRID_SIZE;</span>
+    }
+
+    /**
+     * Returns the vertical component of the bomb's location in pixels.
+     * 
+     * @param yCoord The y coordinate of the bomb.
+     * @return value in pixels
+     */
+    public int pixelY(int yCoord) {
+<span class="fc" id="L168">        return OFFSET + yCoord * GRID_SIZE;</span>
+    }
+
+    /**
+     * Signifies the bomb has exploded.
+     */
+    private void explode() {
+<span class="fc" id="L175">        this.explode = true;</span>
+<span class="fc" id="L176">    }</span>
+
+    /**
+     * Kill characters within the explosion area. Player loses a life while RedEnemy
+     * and YellowEnemy dies.
+     * 
+     * @param player  Player
+     * @param reds    List of red enemies on the map.
+     * @param yellows List of yellow enemies on the map.
+     */
+    private void kill(Player player, List&lt;RedEnemy&gt; reds, List&lt;YellowEnemy&gt; yellows) {
+<span class="fc bfc" id="L187" title="All 2 branches covered.">        if (Tuple.contains(explosionArea, player.currLocation)) {</span>
+<span class="fc" id="L188">            player.die();</span>
+        }
+
+<span class="fc bfc" id="L191" title="All 2 branches covered.">        for (RedEnemy red : reds) {</span>
+<span class="pc bpc" id="L192" title="1 of 2 branches missed.">            if (Tuple.contains(explosionArea, red.currLocation)) {</span>
+<span class="nc" id="L193">                red.die();</span>
+            }
+<span class="fc" id="L195">        }</span>
+
+<span class="fc bfc" id="L197" title="All 2 branches covered.">        for (YellowEnemy yellow : yellows) {</span>
+<span class="pc bpc" id="L198" title="1 of 2 branches missed.">            if (Tuple.contains(explosionArea, yellow.currLocation)) {</span>
+<span class="nc" id="L199">                yellow.die();</span>
+            }
+<span class="fc" id="L201">        }</span>
+<span class="fc" id="L202">    }</span>
+
+    /**
+     * Records the explosion area of the bomb and adds the &quot;location/sprite&quot; pairs
+     * to the hashmap. The explotion's shockwave extends in the four cardinal
+     * directions to a maximum of 2 grids from the location which the bomb was
+     * placed. The explostion can be stopped earlier than 2 spaces if it comes in
+     * contact with &quot;Wall&quot; or &quot;Broken&quot; tile. The &quot;Broken&quot; tile will be demolished.
+     * 
+     * @param map Map of current level.
+     */
+    private void explosion(BomberMap map) {
+<span class="fc" id="L214">        this.explosionCommands.put(location, explosionCentre);</span>
+<span class="fc" id="L215">        this.explosionArea.add(location);</span>
+
+<span class="fc" id="L217">        int xCoordCentre = location.x;</span>
+<span class="fc" id="L218">        int yCoordCentre = location.y;</span>
+
+        // up
+<span class="fc" id="L221">        int yCoordUp1 = yCoordCentre - 1;</span>
+<span class="fc" id="L222">        int yCoordUp2 = yCoordCentre - 2;</span>
+
+<span class="fc bfc" id="L224" title="All 2 branches covered.">        if (map.getTileType(xCoordCentre, yCoordUp1).equals(&quot;empty&quot;)) {</span>
+<span class="fc bfc" id="L225" title="All 2 branches covered.">            if (map.getTileType(xCoordCentre, yCoordUp2).equals(&quot;empty&quot;)) {</span>
+<span class="fc" id="L226">                Tuple up1 = new Tuple(xCoordCentre, yCoordUp1);</span>
+<span class="fc" id="L227">                Tuple up2 = new Tuple(xCoordCentre, yCoordUp2);</span>
+<span class="fc" id="L228">                this.explosionArea.add(up1);</span>
+<span class="fc" id="L229">                this.explosionArea.add(up2);</span>
+<span class="fc" id="L230">                this.explosionCommands.put(up1, explosionVertical);</span>
+<span class="fc" id="L231">                this.explosionCommands.put(up2, explosionTop);</span>
+<span class="fc bfc" id="L232" title="All 2 branches covered.">            } else if (map.getTileType(xCoordCentre, yCoordUp2).equals(&quot;broken&quot;)) {</span>
+<span class="fc" id="L233">                Tuple up1 = new Tuple(xCoordCentre, yCoordUp1);</span>
+<span class="fc" id="L234">                Tuple up2 = new Tuple(xCoordCentre, yCoordUp2);</span>
+<span class="fc" id="L235">                this.explosionCommands.put(up1, explosionVertical);</span>
+<span class="fc" id="L236">                this.explosionCommands.put(up2, explosionTop);</span>
+<span class="fc" id="L237">                this.explosionArea.add(up1);</span>
+<span class="fc" id="L238">                this.demolished.add((new Tuple(xCoordCentre, yCoordUp2)));</span>
+<span class="fc" id="L239">            } else {</span>
+<span class="fc" id="L240">                Tuple up1 = new Tuple(xCoordCentre, yCoordUp1);</span>
+<span class="fc" id="L241">                this.explosionCommands.put(up1, explosionTop);</span>
+<span class="fc" id="L242">                this.explosionArea.add(up1);</span>
+<span class="fc" id="L243">            }</span>
+<span class="pc bpc" id="L244" title="1 of 2 branches missed.">        } else if (map.getTileType(xCoordCentre, yCoordUp1).equals(&quot;broken&quot;)) {</span>
+<span class="nc" id="L245">            Tuple up1 = new Tuple(xCoordCentre, yCoordUp1);</span>
+<span class="nc" id="L246">            this.explosionCommands.put(up1, explosionTop);</span>
+<span class="nc" id="L247">            this.demolished.add((new Tuple(xCoordCentre, yCoordUp1)));</span>
+        }
+
+<span class="fc" id="L250">        int yCoordDown1 = yCoordCentre + 1;</span>
+<span class="fc" id="L251">        int yCoordDown2 = yCoordCentre + 2;</span>
+
+<span class="pc bpc" id="L253" title="1 of 2 branches missed.">        if (map.getTileType(xCoordCentre, yCoordDown1).equals(&quot;empty&quot;)) {</span>
+<span class="fc bfc" id="L254" title="All 2 branches covered.">            if (map.getTileType(xCoordCentre, yCoordDown2).equals(&quot;empty&quot;)) {</span>
+<span class="fc" id="L255">                Tuple down1 = new Tuple(xCoordCentre, yCoordDown1);</span>
+<span class="fc" id="L256">                Tuple down2 = new Tuple(xCoordCentre, yCoordDown2);</span>
+<span class="fc" id="L257">                this.explosionArea.add(down1);</span>
+<span class="fc" id="L258">                this.explosionArea.add(down2);</span>
+<span class="fc" id="L259">                this.explosionCommands.put(down1, explosionVertical);</span>
+<span class="fc" id="L260">                this.explosionCommands.put(down2, explosionBottom);</span>
+<span class="fc bfc" id="L261" title="All 2 branches covered.">            } else if (map.getTileType(xCoordCentre, yCoordDown2).equals(&quot;broken&quot;)) {</span>
+<span class="fc" id="L262">                Tuple down1 = new Tuple(xCoordCentre, yCoordDown1);</span>
+<span class="fc" id="L263">                Tuple down2 = new Tuple(xCoordCentre, yCoordDown2);</span>
+<span class="fc" id="L264">                this.explosionCommands.put(down1, explosionVertical);</span>
+<span class="fc" id="L265">                this.explosionCommands.put(down2, explosionBottom);</span>
+<span class="fc" id="L266">                this.explosionArea.add(down1);</span>
+<span class="fc" id="L267">                this.demolished.add((new Tuple(xCoordCentre, yCoordDown2)));</span>
+<span class="fc" id="L268">            } else {</span>
+<span class="fc" id="L269">                Tuple down1 = new Tuple(xCoordCentre, yCoordDown1);</span>
+<span class="fc" id="L270">                this.explosionCommands.put(down1, explosionBottom);</span>
+<span class="fc" id="L271">                this.explosionArea.add(down1);</span>
+<span class="fc" id="L272">            }</span>
+<span class="nc bnc" id="L273" title="All 2 branches missed.">        } else if (map.getTileType(xCoordCentre, yCoordDown1).equals(&quot;broken&quot;)) {</span>
+<span class="nc" id="L274">            Tuple down1 = new Tuple(xCoordCentre, yCoordDown1);</span>
+<span class="nc" id="L275">            this.explosionCommands.put(down1, explosionBottom);</span>
+<span class="nc" id="L276">            this.demolished.add((new Tuple(xCoordCentre, yCoordDown1)));</span>
+        }
+
+<span class="fc" id="L279">        int xCoordLeft1 = xCoordCentre - 1;</span>
+<span class="fc" id="L280">        int xCoordLeft2 = xCoordCentre - 2;</span>
+
+<span class="fc bfc" id="L282" title="All 2 branches covered.">        if (map.getTileType(xCoordLeft1, yCoordCentre).equals(&quot;empty&quot;)) {</span>
+<span class="fc bfc" id="L283" title="All 2 branches covered.">            if (map.getTileType(xCoordLeft2, yCoordCentre).equals(&quot;empty&quot;)) {</span>
+<span class="fc" id="L284">                Tuple left1 = new Tuple(xCoordLeft1, yCoordCentre);</span>
+<span class="fc" id="L285">                Tuple left2 = new Tuple(xCoordLeft2, yCoordCentre);</span>
+<span class="fc" id="L286">                this.explosionArea.add(left1);</span>
+<span class="fc" id="L287">                this.explosionArea.add(left2);</span>
+<span class="fc" id="L288">                this.explosionCommands.put(left1, explosionHorizontal);</span>
+<span class="fc" id="L289">                this.explosionCommands.put(left2, explosionLeft);</span>
+
+<span class="fc bfc" id="L291" title="All 2 branches covered.">            } else if (map.getTileType(xCoordLeft2, yCoordCentre).equals(&quot;broken&quot;)) {</span>
+<span class="fc" id="L292">                Tuple left1 = new Tuple(xCoordLeft1, yCoordCentre);</span>
+<span class="fc" id="L293">                Tuple left2 = new Tuple(xCoordLeft2, yCoordCentre);</span>
+<span class="fc" id="L294">                this.explosionCommands.put(left1, explosionHorizontal);</span>
+<span class="fc" id="L295">                this.explosionCommands.put(left2, explosionLeft);</span>
+<span class="fc" id="L296">                this.explosionArea.add(left1);</span>
+<span class="fc" id="L297">                this.demolished.add((new Tuple(xCoordLeft2, yCoordCentre)));</span>
+
+<span class="fc" id="L299">            } else {</span>
+<span class="fc" id="L300">                Tuple left1 = new Tuple(xCoordLeft1, yCoordCentre);</span>
+<span class="fc" id="L301">                this.explosionCommands.put(left1, explosionLeft);</span>
+<span class="fc" id="L302">                this.explosionArea.add(left1);</span>
+<span class="fc" id="L303">            }</span>
+<span class="pc bpc" id="L304" title="1 of 2 branches missed.">        } else if (map.getTileType(xCoordLeft1, yCoordCentre).equals(&quot;broken&quot;)) {</span>
+<span class="nc" id="L305">            Tuple left1 = new Tuple(xCoordLeft1, yCoordCentre);</span>
+<span class="nc" id="L306">            this.explosionCommands.put(left1, explosionLeft);</span>
+<span class="nc" id="L307">            this.demolished.add((new Tuple(xCoordLeft1, yCoordCentre)));</span>
+        }
+
+<span class="fc" id="L310">        int xCoordRight1 = xCoordCentre + 1;</span>
+<span class="fc" id="L311">        int xCoordRight2 = xCoordCentre + 2;</span>
+
+<span class="fc bfc" id="L313" title="All 2 branches covered.">        if (map.getTileType(xCoordRight1, yCoordCentre).equals(&quot;empty&quot;)) {</span>
+<span class="fc bfc" id="L314" title="All 2 branches covered.">            if (map.getTileType(xCoordRight2, yCoordCentre).equals(&quot;empty&quot;)) {</span>
+<span class="fc" id="L315">                Tuple right1 = new Tuple(xCoordRight1, yCoordCentre);</span>
+<span class="fc" id="L316">                Tuple right2 = new Tuple(xCoordRight2, yCoordCentre);</span>
+<span class="fc" id="L317">                this.explosionArea.add(right1);</span>
+<span class="fc" id="L318">                this.explosionArea.add(right2);</span>
+<span class="fc" id="L319">                this.explosionCommands.put(right1, explosionHorizontal);</span>
+<span class="fc" id="L320">                this.explosionCommands.put(right2, explosionRight);</span>
+
+<span class="fc bfc" id="L322" title="All 2 branches covered.">            } else if (map.getTileType(xCoordRight2, yCoordCentre).equals(&quot;broken&quot;)) {</span>
+<span class="fc" id="L323">                Tuple right1 = new Tuple(xCoordRight1, yCoordCentre);</span>
+<span class="fc" id="L324">                Tuple right2 = new Tuple(xCoordRight2, yCoordCentre);</span>
+<span class="fc" id="L325">                this.explosionCommands.put(right1, explosionHorizontal);</span>
+<span class="fc" id="L326">                this.explosionCommands.put(right2, explosionRight);</span>
+<span class="fc" id="L327">                this.explosionArea.add(right1);</span>
+<span class="fc" id="L328">                this.demolished.add((new Tuple(xCoordRight2, yCoordCentre)));</span>
+
+<span class="fc" id="L330">            } else {</span>
+<span class="fc" id="L331">                Tuple right1 = new Tuple(xCoordRight1, yCoordCentre);</span>
+<span class="fc" id="L332">                this.explosionCommands.put(right1, explosionRight);</span>
+<span class="fc" id="L333">                this.explosionArea.add(right1);</span>
+<span class="fc" id="L334">            }</span>
+<span class="fc bfc" id="L335" title="All 2 branches covered.">        } else if (map.getTileType(xCoordRight1, yCoordCentre).equals(&quot;broken&quot;)) {</span>
+<span class="fc" id="L336">            Tuple right1 = new Tuple(xCoordRight1, yCoordCentre);</span>
+<span class="fc" id="L337">            this.explosionCommands.put(right1, explosionRight);</span>
+<span class="fc" id="L338">            this.demolished.add((new Tuple(xCoordRight1, yCoordCentre)));</span>
+
+        }
+<span class="fc" id="L341">    }</span>
+
+    /**
+     * The bomb will explode when it is rendered for the specified amount of frames.
+     * This will trigger an explosion which will kill characters and demolish
+     * &quot;Broken&quot; tiles within the explosion area.
+     * 
+     * @param map     Map of the current level.
+     * @param player  Player
+     * @param reds    List of red enemies on the map.
+     * @param yellows List of yellow enemies on the map.
+     */
+    public void tick(BomberMap map, Player player, List&lt;RedEnemy&gt; reds, List&lt;YellowEnemy&gt; yellows) {
+<span class="fc bfc" id="L354" title="All 2 branches covered.">        if (bombFrameCount == TOTAL_FRAMES_BOMB) {</span>
+<span class="fc" id="L355">            this.explode();</span>
+<span class="fc" id="L356">            this.explosion(map);</span>
+        }
+
+<span class="pc bpc" id="L359" title="1 of 2 branches missed.">        if (explosionFrameCount &lt; TOTAL_FRAMES_EXPLOSION) {</span>
+<span class="fc" id="L360">            this.kill(player, reds, yellows);</span>
+        }
+
+<span class="pc bpc" id="L363" title="1 of 2 branches missed.">        if (explosionFrameCount == TOTAL_FRAMES_EXPLOSION - 1) {</span>
+<span class="nc bnc" id="L364" title="All 2 branches missed.">            for (Tuple location : this.demolished) {</span>
+<span class="nc" id="L365">                map.demolish(location);</span>
+<span class="nc" id="L366">            }</span>
+        }
+<span class="fc" id="L368">    }</span>
+
+    /**
+     * Draws the bomb and explosion sprites on the app window. Require Papplet
+     * object.
+     * 
+     * @param app PApplet app of the game.
+     */
+    public void draw(PApplet app) {
+<span class="fc bfc" id="L377" title="All 2 branches covered.">        if (!this.explode) {</span>
+<span class="fc" id="L378">            int currentSprite = Math.floorDiv(bombFrameCount, FRAMES_PER_SPRITE_BOMB);</span>
+<span class="fc" id="L379">            app.image(bombSprites[currentSprite], pixelX(location.x), pixelY(location.y));</span>
+<span class="fc" id="L380">            bombFrameCount++;</span>
+<span class="fc" id="L381">        } else {</span>
+<span class="pc bpc" id="L382" title="1 of 2 branches missed.">            if (explosionFrameCount &lt; TOTAL_FRAMES_EXPLOSION) {</span>
+<span class="fc bfc" id="L383" title="All 2 branches covered.">                for (Tuple coords : this.explosionCommands.keySet()) {</span>
+<span class="fc" id="L384">                    int xPixel = pixelX(coords.x);</span>
+<span class="fc" id="L385">                    int yPixel = pixelY(coords.y);</span>
+<span class="fc" id="L386">                    app.image(this.explosionCommands.get(coords), xPixel, yPixel);</span>
+<span class="fc" id="L387">                }</span>
+<span class="fc" id="L388">                explosionFrameCount++;</span>
+            }
+        }
+
+<span class="fc" id="L392">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

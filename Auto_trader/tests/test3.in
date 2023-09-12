@@ -1,0 +1,24 @@
+traders
+trades
+add trader1 100
+add trader2 100
+import trader1 ABC 100
+import trader2 DEF 100
+sell trader1 ABC 30 3
+sell trader1 ABC 0 0
+amount trader1 ABC
+buy trader2 ABC 20 3
+buy trader2 DEF 30 3
+cancel buy 0000
+cancel buy 0002
+cancel sell 0000
+cancel sell 0000
+traders
+trades
+trades trader trader1
+trades trader trader2
+trades product ABC
+trades product DEF
+book sell
+book buy
+exit

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Tuple.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">Tuple.java</span></div><h1>Tuple.java</h1><pre class="source lang-java linenums">package demolition;
+
+import java.util.List;
+
+/**
+ * A mechanism which stores a pair of integers. Used to record the coordinates
+ * of the location of the game objects.
+ */
+public class Tuple {
+
+    /**
+     * Represents the first integer of the pair.
+     */
+    public int x;
+
+    /**
+     * Represents the second integer of the pair.
+     */
+    public int y;
+
+    /**
+     * Creates a new Tuple object. Requires two integers.
+     * 
+     * @param x First integer of the pair
+     * @param y Second integer of the pair
+     */
+<span class="fc" id="L27">    public Tuple(int x, int y) {</span>
+<span class="fc" id="L28">        this.x = x;</span>
+<span class="fc" id="L29">        this.y = y;</span>
+<span class="fc" id="L30">    }</span>
+
+    /**
+     * Replaces the pair of integers. Requires a new pair of integers.
+     * 
+     * @param x First integer of new pair
+     * @param y Second integer of new pair
+     */
+    public void update(int x, int y) {
+<span class="fc" id="L39">        this.x = x;</span>
+<span class="fc" id="L40">        this.y = y;</span>
+
+<span class="fc" id="L42">    }</span>
+
+    /**
+     * Returns true if the given Tuple exists in the given list of Tuple objects.
+     * 
+     * @param tuples List of Tuple objects
+     * @param tuple  Given Tuple
+     * @return If the given Tuple exists in the given list of Tuple objects.
+     */
+    public static boolean contains(List&lt;Tuple&gt; tuples, Tuple tuple) {
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        for (Tuple existingTuple : tuples) {</span>
+<span class="fc bfc" id="L53" title="All 4 branches covered.">            if (existingTuple.x == tuple.x &amp;&amp; existingTuple.y == tuple.y) {</span>
+<span class="fc" id="L54">                return true;</span>
+            }
+<span class="fc" id="L56">        }</span>
+<span class="fc" id="L57">        return false;</span>
+    }
+
+    /**
+     * Returns if the existing Tuple and given Tuple are equal.
+     * 
+     * @param tuple Given Tuple
+     * @return if the existing Tuple and given Tuple are equal.
+     */
+    public boolean tupleEquals(Tuple tuple) {
+<span class="fc bfc" id="L67" title="All 4 branches covered.">        if (this.x == tuple.x &amp;&amp; this.y == tuple.y) {</span>
+<span class="fc" id="L68">            return true;</span>
+        }
+<span class="fc" id="L70">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

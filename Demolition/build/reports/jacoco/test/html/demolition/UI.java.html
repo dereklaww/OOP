@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UI.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">UI.java</span></div><h1>UI.java</h1><pre class="source lang-java linenums">package demolition;
+
+import processing.core.PApplet;
+import processing.core.PFont;
+import processing.core.PImage;
+
+/**
+ * Represents the user interface (UI) of the game, shown on the top border of
+ * the screen.
+ */
+public class UI {
+
+<span class="fc" id="L13">    private static final Tuple PLAYER_LIFE_ICON_POS = new Tuple(128, 21);</span>
+<span class="fc" id="L14">    private static final Tuple PLAYER_LIFE_TEXT_POS = new Tuple(173, 48);</span>
+<span class="fc" id="L15">    private static final Tuple TIMER_ICON_POS = new Tuple(256, 21);</span>
+<span class="fc" id="L16">    private static final Tuple TIMER_TEXT_POS = new Tuple(301, 48);</span>
+
+    private static PImage playerLife;
+    private static PImage clock;
+    private static PFont font;
+
+    /**
+     * Represents remainting time on the current level.
+     */
+    private int timer;
+
+    /**
+     * Represents the number of times the logic is called, initially 0.
+     */
+    private int timerFrameCount;
+
+    /**
+     * Creates a new UI object. Requires the initial time of the level.
+     * 
+     * @param time
+     */
+<span class="fc" id="L37">    public UI(int time) {</span>
+<span class="fc" id="L38">        this.timer = time;</span>
+<span class="fc" id="L39">        this.timerFrameCount = 0;</span>
+<span class="fc" id="L40">    }</span>
+
+    /**
+     * Loads in all the sprites and font required to generate the UI object on the
+     * app. Requires Papplet object.
+     * 
+     * @param app App of the game.
+     */
+    public static void setup(PApplet app) {
+<span class="fc" id="L49">        playerLife = app.loadImage(&quot;src/main/resources/icons/player.png&quot;);</span>
+<span class="fc" id="L50">        clock = app.loadImage(&quot;src/main/resources/icons/clock.png&quot;);</span>
+<span class="fc" id="L51">        font = app.createFont(&quot;src/main/resources/PressStart2P-Regular.ttf&quot;, 20);</span>
+<span class="fc" id="L52">        app.textFont(font);</span>
+<span class="fc" id="L53">    }</span>
+
+    /**
+     * Returns remaining time on the current level.
+     * 
+     * @return Time left
+     */
+    public int getTimer() {
+<span class="fc" id="L61">        return this.timer;</span>
+    }
+
+    /**
+     * Logic to control time decrement.
+     */
+    public void timerTick() {
+<span class="fc" id="L68">        this.timerFrameCount++;</span>
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (timerFrameCount == 60) {</span>
+<span class="fc" id="L70">            timer--;</span>
+<span class="fc" id="L71">            timerFrameCount = 0;</span>
+        }
+<span class="fc" id="L73">    }</span>
+
+    /**
+     * Draws the UI on the app window. Requires Papplet object.
+     * 
+     * @param app    App of the game
+     * @param player Player
+     */
+    public void draw(PApplet app, Player player) {
+<span class="fc" id="L82">        app.image(playerLife, PLAYER_LIFE_ICON_POS.x, PLAYER_LIFE_ICON_POS.y);</span>
+<span class="fc" id="L83">        app.text(player.getLifeCount(), PLAYER_LIFE_TEXT_POS.x, PLAYER_LIFE_TEXT_POS.y);</span>
+<span class="fc" id="L84">        app.image(clock, TIMER_ICON_POS.x, TIMER_ICON_POS.y);</span>
+<span class="fc" id="L85">        app.text(timer, TIMER_TEXT_POS.x, TIMER_TEXT_POS.y);</span>
+<span class="fc" id="L86">        app.fill(0, 0, 0);</span>
+<span class="fc" id="L87">        timerTick();</span>
+<span class="fc" id="L88">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

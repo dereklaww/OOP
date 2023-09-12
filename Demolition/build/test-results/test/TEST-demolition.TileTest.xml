@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="demolition.TileTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2023-09-12T12:48:27" hostname="Dereks-MBP-2.gateway" time="0.004">
+  <properties/>
+  <testcase name="constructor()" classname="demolition.TileTest" time="0.001"/>
+  <testcase name="getTileTypeTest()" classname="demolition.TileTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

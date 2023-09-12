@@ -1,0 +1,23 @@
+add trader1 100
+add trader2 100
+import trader1 Nike 100
+import trader1 Adidas 200
+sell trader2 Nike 80 10
+sell trader1 Nike 80 10
+amount trader1 Nike
+buy trader2 Adidas 50 5
+order 0000
+order 0001
+order 0002
+sell trader1 Adidas 20 10
+sell trader1 Adidas 30 5
+sell trader1 Adidas 50 5
+sell trader3 Adidas 10 10
+book sell
+book buy
+buy trader2 Nike 50 10
+buy trader2 Nike 100 10
+buy trader3 Nike 100 10
+book buy
+book sell
+exit

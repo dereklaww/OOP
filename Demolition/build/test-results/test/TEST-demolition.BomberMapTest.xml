@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="demolition.BomberMapTest" tests="10" skipped="0" failures="0" errors="0" timestamp="2023-09-12T12:48:26" hostname="Dereks-MBP-2.gateway" time="0.074">
+  <properties/>
+  <testcase name="validFileTest()" classname="demolition.BomberMapTest" time="0.031"/>
+  <testcase name="constructor()" classname="demolition.BomberMapTest" time="0.001"/>
+  <testcase name="noGoalTest()" classname="demolition.BomberMapTest" time="0.006"/>
+  <testcase name="multipleGoalTest()" classname="demolition.BomberMapTest" time="0.001"/>
+  <testcase name="invalidHeightTest()" classname="demolition.BomberMapTest" time="0.005"/>
+  <testcase name="invalidWidthTest()" classname="demolition.BomberMapTest" time="0.001"/>
+  <testcase name="noPlayerTest()" classname="demolition.BomberMapTest" time="0.002"/>
+  <testcase name="invalidBorderTest()" classname="demolition.BomberMapTest" time="0.007"/>
+  <testcase name="invalidMapCharTest()" classname="demolition.BomberMapTest" time="0.006"/>
+  <testcase name="multiplePlayerTest()" classname="demolition.BomberMapTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[File not found
+File not found
+]]></system-err>
+</testsuite>

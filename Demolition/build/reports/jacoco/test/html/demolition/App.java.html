@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>App.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Demolition</a> &gt; <a href="index.source.html" class="el_package">demolition</a> &gt; <span class="el_source">App.java</span></div><h1>App.java</h1><pre class="source lang-java linenums">package demolition;
+
+import java.util.List;
+import processing.core.PApplet;
+
+/**
+ * Represents the PApplet App used to run the game.
+ */
+public class App extends PApplet {
+
+    /**
+     * Width of Papplet app window in pixels.
+     */
+    public static final int WIDTH = 480;
+    /**
+     * Height of app window in pixels.
+     */
+    public static final int HEIGHT = 480;
+
+    /**
+     * Represents the number of frames the program is drawing per second.
+     */
+    public static final int FPS = 60;
+
+    /**
+     * GameMechanics object associated with the App object.
+     */
+    public GameMechanics gameMechanics;
+
+    /**
+     * BomberMap object of the current level.
+     */
+    public BomberMap currentMap;
+
+    /**
+     * UI object of the current level.
+     */
+    public UI currentUI;
+
+    /**
+     * Player object of the current level.
+     */
+    public Player player;
+
+    /**
+     * List of RedEnemy objects of the current level.
+     */
+    public List&lt;RedEnemy&gt; reds;
+
+    /**
+     * List of YellowEne,y objects of the current level.
+     */
+    public List&lt;YellowEnemy&gt; yellows;
+
+    /**
+     * Represents the path of the configuration file.
+     */
+    private String configPath;
+
+<span class="fc" id="L60">    private boolean keyIsReleased = true;</span>
+
+    /**
+     * Creates new App object.
+     */
+<span class="fc" id="L65">    public App() {</span>
+<span class="fc" id="L66">        this.gameMechanics = new GameMechanics();</span>
+<span class="fc" id="L67">        this.configPath = &quot;config.json&quot;;</span>
+
+<span class="fc" id="L69">    }</span>
+
+    /**
+     * Settings of the map window size, given the height and width in pixels.
+     */
+    public void settings() {
+<span class="fc" id="L75">        size(WIDTH, HEIGHT);</span>
+<span class="fc" id="L76">    }</span>
+
+    public void setConfig(String path) {
+<span class="fc" id="L79">        this.configPath = path;</span>
+<span class="fc" id="L80">    }</span>
+
+    /**
+     * Inital setup for all classes.
+     */
+    public void setup() {
+<span class="fc" id="L86">        frameRate(FPS);</span>
+<span class="fc" id="L87">        BomberMap.setup(this);</span>
+<span class="fc" id="L88">        Player.setup(this);</span>
+<span class="fc" id="L89">        RedEnemy.setup(this);</span>
+<span class="fc" id="L90">        YellowEnemy.setup(this);</span>
+<span class="fc" id="L91">        Bomb.setup(this);</span>
+<span class="fc" id="L92">        UI.setup(this);</span>
+<span class="fc" id="L93">        gameMechanics.config(this, configPath);</span>
+<span class="fc" id="L94">        gameMechanics.setChar();</span>
+<span class="fc" id="L95">        currentMap = gameMechanics.getCurrentMap();</span>
+<span class="fc" id="L96">        currentUI = gameMechanics.getCurrentUI();</span>
+<span class="fc" id="L97">        player = gameMechanics.getPlayer();</span>
+<span class="fc" id="L98">        reds = gameMechanics.getReds();</span>
+<span class="fc" id="L99">        yellows = gameMechanics.getYellows();</span>
+
+<span class="fc" id="L101">    }</span>
+
+    /**
+     * Logic control of each class, refresh game configurations when signalled.
+     */
+    public void tick() {
+<span class="fc" id="L107">        gameMechanics.tick();</span>
+
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        if (gameMechanics.refresh) {</span>
+<span class="fc" id="L110">            currentMap = gameMechanics.getCurrentMap();</span>
+<span class="fc" id="L111">            currentUI = gameMechanics.getCurrentUI();</span>
+<span class="fc" id="L112">            player = gameMechanics.getPlayer();</span>
+<span class="fc" id="L113">            reds = gameMechanics.getReds();</span>
+<span class="fc" id="L114">            yellows = gameMechanics.getYellows();</span>
+<span class="fc" id="L115">            gameMechanics.refresh = false;</span>
+        }
+<span class="fc bfc" id="L117" title="All 2 branches covered.">        for (RedEnemy red : reds) {</span>
+<span class="fc" id="L118">            red.tick(currentMap);</span>
+<span class="fc" id="L119">        }</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        for (YellowEnemy yellow : yellows) {</span>
+<span class="fc" id="L121">            yellow.tick(currentMap);</span>
+<span class="fc" id="L122">        }</span>
+
+<span class="fc" id="L124">    }</span>
+
+    /**
+     * Draw control of each class, draws game end on-screen text when signalled game
+     * end.
+     */
+    public void draw() {
+<span class="fc" id="L131">        background(255, 165, 0);</span>
+<span class="fc bfc" id="L132" title="All 2 branches covered.">        if (!gameMechanics.isFinish()) {</span>
+<span class="fc" id="L133">            this.currentUI.draw(this, this.player);</span>
+<span class="fc" id="L134">            this.currentMap.draw(this);</span>
+<span class="fc" id="L135">            this.player.draw(this);</span>
+<span class="fc bfc" id="L136" title="All 2 branches covered.">            for (RedEnemy red : reds) {</span>
+<span class="fc" id="L137">                red.draw(this);</span>
+<span class="fc" id="L138">            }</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">            for (YellowEnemy yellow : yellows) {</span>
+<span class="fc" id="L140">                yellow.draw(this);</span>
+<span class="fc" id="L141">            }</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">            if (this.player.getBombs().size() &gt; 0) {</span>
+<span class="fc bfc" id="L143" title="All 2 branches covered.">                for (Bomb bomb : this.player.getBombs()) {</span>
+<span class="fc" id="L144">                    bomb.draw(this);</span>
+<span class="fc" id="L145">                    bomb.tick(currentMap, player, reds, yellows);</span>
+<span class="fc" id="L146">                }</span>
+            }
+<span class="fc" id="L148">            this.tick();</span>
+
+        } else {
+<span class="fc" id="L151">            gameMechanics.draw(this);</span>
+        }
+<span class="fc" id="L153">    }</span>
+
+    /**
+     * Arrow keys and Spacebar configurations for Player movement and Bomb
+     * placement.
+     */
+    public void keyPressed() {
+<span class="nc bnc" id="L160" title="All 2 branches missed.">        if (!gameMechanics.isFinish()) {</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">            if (keyIsReleased) {</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">                if (keyCode == 32) {</span>
+<span class="nc" id="L163">                    this.player.bomb();</span>
+<span class="nc" id="L164">                    keyIsReleased = false;</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">                } else if (keyCode == UP) {</span>
+<span class="nc" id="L166">                    this.player.move(&quot;Up&quot;, currentMap);</span>
+<span class="nc" id="L167">                    keyIsReleased = false;</span>
+<span class="nc bnc" id="L168" title="All 2 branches missed.">                } else if (keyCode == DOWN) {</span>
+<span class="nc" id="L169">                    this.player.move(&quot;Down&quot;, currentMap);</span>
+<span class="nc" id="L170">                    keyIsReleased = false;</span>
+<span class="nc bnc" id="L171" title="All 2 branches missed.">                } else if (keyCode == LEFT) {</span>
+<span class="nc" id="L172">                    this.player.move(&quot;Left&quot;, currentMap);</span>
+<span class="nc" id="L173">                    keyIsReleased = false;</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">                } else if (keyCode == RIGHT) {</span>
+<span class="nc" id="L175">                    this.player.move(&quot;Right&quot;, currentMap);</span>
+<span class="nc" id="L176">                    keyIsReleased = false;</span>
+                }
+            }
+        }
+<span class="nc" id="L180">    }</span>
+
+    /**
+     * Signal key is released to allow next key press command.
+     */
+    public void keyReleased() {
+<span class="nc" id="L186">        keyIsReleased = true;</span>
+<span class="nc" id="L187">    }</span>
+
+    /**
+     * Runs the program.
+     * 
+     * @param args Command line arguments (can be ignored)
+     */
+    public static void main(String[] args) {
+
+<span class="nc" id="L196">        PApplet.main(&quot;demolition.App&quot;);</span>
+
+<span class="nc" id="L198">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

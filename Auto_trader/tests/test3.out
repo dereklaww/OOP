@@ -1,0 +1,25 @@
+No traders in the market.
+No trades have been completed.
+Success.
+Success.
+Trader now has 100.00 units of ABC.
+Trader now has 100.00 units of DEF.
+No trades could be made, order added to sell book.
+70.00
+Product bought in entirety, trades as follows:
+trader1->trader2: 20.00xABC for $3.00.
+No trades could be made, order added to buy book.
+No such order in buy book.
+Order successfully cancelled.
+Order successfully cancelled.
+No such order in sell book.
+trader1
+trader2
+trader1->trader2: 20.00xABC for $3.00.
+trader1->trader2: 20.00xABC for $3.00.
+trader1->trader2: 20.00xABC for $3.00.
+trader1->trader2: 20.00xABC for $3.00.
+No trades have been completed with given product.
+The sell book is empty.
+The buy book is empty.
+Have a nice day.

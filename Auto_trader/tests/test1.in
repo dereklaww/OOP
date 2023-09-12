@@ -1,0 +1,17 @@
+add trader -100
+add trader 100
+add trader 0
+balance trader
+balance trader_2
+inventory trader_2
+inventory trader 
+import trader Nike 0
+import trader Nike 100
+import trader_2 Nike 100
+amount trader Nike
+amount trader Adidas
+amount trader_2 Nike
+export trader Nike 50
+export trader Adidas 100
+export trader_2 Nike 100
+exit

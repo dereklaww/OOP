@@ -1,0 +1,30 @@
+$ Success.
+$ Success.
+$ Trader now has 100.00 units of Nike.
+$ Trader now has 200.00 units of Adidas.
+$ Order could not be placed onto the market.
+$ No trades could be made, order added to sell book.
+$ 20.00
+$ No trades could be made, order added to buy book.
+$ Order is not present in either order book.
+$ 0001: SELL 80.00xNike @ $10.00
+$ 0002: BUY 50.00xAdidas @ $5.00
+$ No trades could be made, order added to sell book.
+$ Product sold in entirety, trades as follows:
+trader1->trader2: 30.00xAdidas for $5.00.
+$ Product sold in part, trades as follows:
+trader1->trader2: 20.00xAdidas for $5.00.
+$ No such trader in the market.
+$ 0001: SELL 80.00xNike @ $10.00
+0003: SELL 20.00xAdidas @ $10.00
+0005: SELL 30.00xAdidas @ $5.00
+$ The buy book is empty.
+$ Product bought in entirety, trades as follows:
+trader1->trader2: 50.00xNike for $10.00.
+$ Product bought in part, trades as follows:
+trader1->trader2: 30.00xNike for $10.00.
+$ No such trader in the market.
+$ 0007: BUY 70.00xNike @ $10.00
+$ 0003: SELL 20.00xAdidas @ $10.00
+0005: SELL 30.00xAdidas @ $5.00
+$ Have a nice day.

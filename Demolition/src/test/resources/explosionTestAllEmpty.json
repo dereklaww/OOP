@@ -1,0 +1,9 @@
+{
+  "levels": [
+    {
+      "path": "src/test/resources/explosionTestAllEmpty.txt",
+      "time": 180
+    }
+  ],
+  "lives": 3
+}
